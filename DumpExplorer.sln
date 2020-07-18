@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.30225.117
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpExplorer.Core", "DumpExplorer.Core\DumpExplorer.Core.csproj", "{80ED5AA5-EB98-4069-A8A0-CC3F28DA56C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Playground", "Playground\Playground.csproj", "{578B7739-106E-4190-9B09-876C47646142}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "Playground\Playground.csproj", "{578B7739-106E-4190-9B09-876C47646142}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpExplorer.Tests", "DumpExplorer.Tests\DumpExplorer.Tests.csproj", "{0CAD7EC7-E33A-43BF-B249-DD126A11098D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpExplorer.Tests", "DumpExplorer.Tests\DumpExplorer.Tests.csproj", "{0CAD7EC7-E33A-43BF-B249-DD126A11098D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DumpExplorer", "DumpExplorer\DumpExplorer.csproj", "{A9FBA87D-361E-45B5-AECC-77547F9BF94B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{0CAD7EC7-E33A-43BF-B249-DD126A11098D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CAD7EC7-E33A-43BF-B249-DD126A11098D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CAD7EC7-E33A-43BF-B249-DD126A11098D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9FBA87D-361E-45B5-AECC-77547F9BF94B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9FBA87D-361E-45B5-AECC-77547F9BF94B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9FBA87D-361E-45B5-AECC-77547F9BF94B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9FBA87D-361E-45B5-AECC-77547F9BF94B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
