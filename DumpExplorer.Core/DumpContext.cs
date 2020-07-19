@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DumpExplorer.Core
 {
-    public class DumpContext : IDisposable
+    public sealed class DumpContext : IDisposable
     {
         private readonly IDocumentStore _documentStore;
         private DataTarget _target;
@@ -23,7 +23,7 @@ namespace DumpExplorer.Core
         public DumpContext(IDocumentStore documentStore, string databaseName = null)
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
-            this._databaseName = databaseName;
+            _databaseName = databaseName;
         }
 
         public async Task ExtractDataWithAsync(params IDataExtractor[] dataExtractors) => 
@@ -84,10 +84,10 @@ namespace DumpExplorer.Core
         ~DumpContext() => Dispose();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void OnOperationEvent(string operationName, TaskStatus status, string message = null) =>
+        private void OnOperationEvent(string operationName, TaskStatus status, string message = null) =>
             OnOperationEvent(new OperationEventArgs(operationName, status, message));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual void OnOperationEvent(OperationEventArgs e) => OperationEvent?.Invoke(this, e);
+        private void OnOperationEvent(OperationEventArgs e) => OperationEvent?.Invoke(this, e);
     }
 }
