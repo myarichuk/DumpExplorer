@@ -82,7 +82,7 @@ namespace DumpExplorer.Tests
             }
         }
 
-        public Basics()
+        static Basics()
         {
             EmbeddedServer.Instance.StartServer(new ServerOptions
             {
@@ -90,6 +90,10 @@ namespace DumpExplorer.Tests
                 CommandLineArgs = new List<string> { "Setup.Mode=None", "RunInMemory=true" },
                 FrameworkVersion = Environment.Version.ToString()
             });
+        }
+
+        public Basics()
+        {            
             _store = EmbeddedServer.Instance.GetDocumentStore(new DatabaseOptions("Dump")
             {
                 Conventions = new DocumentConventions
@@ -108,7 +112,6 @@ namespace DumpExplorer.Tests
         public async Task Can_load_dump()
         {
             using var dumpContext = new DumpContext(_store);
-
             dumpContext.LoadDump("allocations.dmp");
 
             await dumpContext.ExtractDataWithAsync(new HeapObjectsExtractor(), new StringsExtractor());
@@ -122,5 +125,21 @@ namespace DumpExplorer.Tests
             Assert.Equal(146, objectCount);
             Assert.Equal(34, stringCount);
         }
+
+        [Fact]
+        public async Task Can_extract_gc_roots()
+        {
+            using var dumpContext = new DumpContext(_store);
+            dumpContext.LoadDump("allocations.dmp");
+
+            await dumpContext.ExtractDataWithAsync(new GcRootsExtractor());
+            using var session = _store.OpenSession();
+
+            var gcRootCount = session.Query<Core.GcRootPath>().Count();
+
+            //sanity check...
+            Assert.Equal(60, gcRootCount);
+        }
+
     }
 }

@@ -18,8 +18,8 @@ namespace DumpExplorer.Core
                 cfg.CreateMap<ClrObject, String>()
                     .ForMember(x => x.Value, opt => opt.MapFrom(src => src.AsString(1024 * 1024 * 10) ?? string.Empty));
                 cfg.CreateMap<ClrFinalizerRoot, ObjectRoot>();
-                cfg.CreateMap<IClrRoot, ObjectRoot>();
-                cfg.CreateMap<GCRootPath, ObjectRootPath>();
+                cfg.CreateMap<IClrRoot, GcRoot>();
+                cfg.CreateMap<GCRootPath, GcRootPath>();
             });
 
             return new Mapper(config);
