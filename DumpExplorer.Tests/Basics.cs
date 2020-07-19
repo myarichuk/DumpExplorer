@@ -8,9 +8,11 @@ using Raven.Embedded;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace DumpExplorer.Tests
@@ -103,15 +105,13 @@ namespace DumpExplorer.Tests
         }
 
         [Fact]
-        public void Can_load_dump()
+        public async Task Can_load_dump()
         {
-            var dumpContext = new DumpContext(new IDataExtractor[]
-            {
-                new HeapObjectsExtractor(),
-                new StringsExtractor()
-            }, _store);
+            using var dumpContext = new DumpContext(_store);
 
-            dumpContext.ImportFromDump("allocations.dmp");
+            dumpContext.LoadDump("allocations.dmp");
+
+            await dumpContext.ExtractDataWithAsync(new HeapObjectsExtractor(), new StringsExtractor());
 
             using var session = _store.OpenSession();
 

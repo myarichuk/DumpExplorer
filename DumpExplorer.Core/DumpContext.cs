@@ -1,53 +1,93 @@
-﻿using Microsoft.Diagnostics.Runtime;
+﻿using DumpExplorer.Core.Events;
+using Microsoft.Diagnostics.Runtime;
 using Raven.Client.Documents;
 using SuperDump;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO.Compression;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DumpExplorer.Core
 {
-    public class DumpContext
+    public class DumpContext : IDisposable
     {
-        private readonly IEnumerable<IDataExtractor> _dataExtractors;
         private readonly IDocumentStore _documentStore;
+        private DataTarget _target;
+        private ClrRuntime _runtime;
+        private readonly string _databaseName;
 
-        public event Action<string> ActivityLog;
+        public event EventHandler<OperationEventArgs> OperationEvent;
 
-        public DumpContext(IEnumerable<IDataExtractor> dataExtractors, IDocumentStore documentStore)
+        public DumpContext(IDocumentStore documentStore, string databaseName = null)
         {
-            _dataExtractors = dataExtractors ?? throw new ArgumentNullException(nameof(dataExtractors));
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
+            this._databaseName = databaseName;
         }
 
-        public void ImportFromDump(string dumpPath)
+        public async Task ExtractDataWithAsync(params IDataExtractor[] dataExtractors) => 
+            await Task.WhenAll(dataExtractors.Select(extractor => ExtractDataWithAsync(extractor))).ConfigureAwait(false);
+
+        public async Task ExtractDataWithAsync(IDataExtractor dataExtractor, CancellationToken token = default)
+        {
+            OnOperationEvent(dataExtractor.Name, TaskStatus.Created);
+            var bulkInsert = _documentStore.BulkInsert(_databaseName, token);
+            OnOperationEvent(dataExtractor.Name, TaskStatus.Running);
+            try
+            {                
+                foreach (var dataItem in dataExtractor.ExtractData(_runtime, message => OnOperationEvent(dataExtractor.Name, TaskStatus.Running, message)))
+                {
+                    var newId = await bulkInsert.StoreAsync(dataItem);
+                    OnOperationEvent(dataExtractor.Name, TaskStatus.Running, $"Imported data item with Id = {newId} (data item type = {dataExtractor.TypeName})");
+                }
+            }
+            catch(Exception e)
+            {
+                OnOperationEvent(dataExtractor.Name, TaskStatus.Faulted, $"Failed data extraction task. Message: {e.Message}, Stack trace: {e.StackTrace}");
+                throw;
+            }
+            finally
+            {
+                await bulkInsert.DisposeAsync();
+            }
+            OnOperationEvent(dataExtractor.Name, TaskStatus.RanToCompletion);
+        }
+
+        public void LoadDump(string dumpPath)
         {
             Debug.Assert(_documentStore != null);
 
-            using var target = DataTarget.LoadDump(dumpPath);
+            if (_target != null)
+                Dispose();
 
-            if (target.ClrVersions.Length == 0)
+            _target = DataTarget.LoadDump(dumpPath);
+
+            if (_target.ClrVersions.Length == 0)
                 throw new InvalidOperationException("Haven't found relevant CLR versions for the dump, cannot continue with the import");
 
-            var runtime = target.CreateRuntime();
-
-            using var bulkInsert = _documentStore.BulkInsert();
-            bulkInsert.CompressionLevel = CompressionLevel.Optimal;
-
-            OnActivity("Starting data extraction from the dump.");
-            foreach (var dataExtractor in _dataExtractors)
-            {
-                OnActivity($"Data extractor starting: {dataExtractor.Name}");
-                foreach (var dataItem in dataExtractor.ExtractData(runtime, ActivityLog))
-                {
-                    var newId = bulkInsert.Store(dataItem);
-                    OnActivity($"{dataExtractor} recorded '{newId}'");
-                }
-                OnActivity($"Data extractor finished: {dataExtractor.Name}");
-            }
+            _runtime = _target.CreateRuntime();
         }
 
-        protected virtual void OnActivity(string message) => ActivityLog?.Invoke(message);
+
+        public void Dispose()
+        {
+            _runtime?.Dispose();
+            _runtime = null;
+
+            _target?.Dispose();
+            _target = null;
+
+            GC.SuppressFinalize(this);
+        }
+
+        ~DumpContext() => Dispose();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void OnOperationEvent(string operationName, TaskStatus status, string message = null) =>
+            OnOperationEvent(new OperationEventArgs(operationName, status, message));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual void OnOperationEvent(OperationEventArgs e) => OperationEvent?.Invoke(this, e);
     }
 }

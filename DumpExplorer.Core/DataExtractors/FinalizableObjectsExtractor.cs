@@ -19,7 +19,7 @@ namespace DumpExplorer.Core.DataExtractors
             return from finalizerRoot in clr.Heap.EnumerateFinalizerRoots()
                    let segment = clr.Heap.GetSegmentByAddress(finalizerRoot.Object.Address)
                    select AutoMapper.Instance.Map<ObjectRoot>(finalizerRoot,
-                        opts => opts.AfterMap((_, dst) => 
+                        opts => opts.AfterMap((_, dst) =>
                                     dst.Generation = segment.GetGeneration(dst.Object.Address)));
         }
     }
