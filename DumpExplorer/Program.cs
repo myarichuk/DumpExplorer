@@ -16,7 +16,7 @@ namespace DumpExplorer
         {
             var configuration = new ConfigurationBuilder()
                            .SetBasePath(Directory.GetCurrentDirectory())
-                           .AddJsonFile(AppDomain.CurrentDomain.BaseDirectory + "\\appsettings.json", optional: true, reloadOnChange: true)
+                           .AddJsonFile($"{AppDomain.CurrentDomain.BaseDirectory}{Path.DirectorySeparatorChar}appsettings.json", optional: true, reloadOnChange: true)
                            .AddEnvironmentVariables()
                            .Build();
 

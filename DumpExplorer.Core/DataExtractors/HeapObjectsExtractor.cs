@@ -11,7 +11,7 @@ namespace DumpExplorer.Core.DataExtractors
 
         public string Description => "Extract information about all managed objects located on the managed heap";
 
-        public string TypeName => "object";
+        public string TypeName => nameof(Object);
 
         public IEnumerable<dynamic> ExtractData(ClrRuntime clr, Action<string> actionLog = null)
         {
@@ -22,7 +22,11 @@ namespace DumpExplorer.Core.DataExtractors
                    where !obj.Type.Name.StartsWith("System.Diagnostics.Tracing")
                    let segment = clr.Heap.GetSegmentByAddress(obj.Address)
                    select AutoMapper.Instance.Map<Object>(obj, 
-                        opts => opts.AfterMap((_, dst) => dst.Generation = segment.GetGeneration(dst.Address)));
+                        opts => opts.AfterMap((_, dst) =>
+                        {
+                            dst.Id = $"{TypeName}/{dst.Address}";
+                            dst.Generation = segment.GetGeneration(dst.Address);
+                        }));
         }
     }
 }

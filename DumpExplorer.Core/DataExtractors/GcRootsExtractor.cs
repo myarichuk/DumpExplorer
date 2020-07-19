@@ -9,7 +9,7 @@ namespace DumpExplorer.Core.DataExtractors
     {
         public string Name => "GC Roots Extractor";
         public string Description => "Extract information about GC roots";
-        public string TypeName => "gcroot";
+        public string TypeName => nameof(GcRoot);
 
         public IEnumerable<dynamic> ExtractData(ClrRuntime clr, Action<string> actionLog = null)
         {

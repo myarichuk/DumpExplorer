@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using Microsoft.Diagnostics.Runtime;
 using System;
 
 namespace DumpExplorer.Core
@@ -10,16 +9,16 @@ namespace DumpExplorer.Core
         {
             var config = new MapperConfiguration(cfg => 
             {
-                cfg.CreateMap<ClrObject, Object>();
-                cfg.CreateMap<ClrType, Type>();
-                cfg.CreateMap<ClrMethod, Method>();
-                cfg.CreateMap<ClrInstanceField, Field>();
-                cfg.CreateMap<ClrStaticField, Field>();
-                cfg.CreateMap<ClrObject, String>()
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrObject, Object>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrType, Type>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrMethod, Method>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrInstanceField, Field>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrStaticField, Field>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrObject, String>()
                     .ForMember(x => x.Value, opt => opt.MapFrom(src => src.AsString(1024 * 1024 * 10) ?? string.Empty));
-                cfg.CreateMap<ClrFinalizerRoot, ObjectRoot>();
-                cfg.CreateMap<IClrRoot, GcRoot>();
-                cfg.CreateMap<GCRootPath, GcRootPath>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrFinalizerRoot, FinalizableObjectRoot>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.IClrRoot, GcRoot>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.GCRootPath, GcRootPath>();
             });
 
             return new Mapper(config);

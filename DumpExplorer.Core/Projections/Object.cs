@@ -1,9 +1,13 @@
 ﻿using Microsoft.Diagnostics.Runtime;
+using System;
+using System.Collections.Generic;
 
 namespace DumpExplorer.Core
 {
-    public class Object
+    public class Object : IEquatable<Object>
     {
+        public string Id { get; set; }
+
         public int Generation { get; set; }
 
         //
@@ -60,6 +64,17 @@ namespace DumpExplorer.Core
         // Summary:
         //     Gets a value indicating whether this object is an array.
         public bool IsArray { get; set; }
+
         public bool IsRuntimeType { get; set; }
+
+        public override bool Equals(object obj) => Equals(obj as Object);
+
+        public bool Equals(Object other) => other != null && Id == other.Id;
+
+        public override int GetHashCode() => HashCode.Combine(Id);
+
+        public static bool operator ==(Object left, Object right) => EqualityComparer<Object>.Default.Equals(left, right);
+
+        public static bool operator !=(Object left, Object right) => !(left == right);
     }
 }

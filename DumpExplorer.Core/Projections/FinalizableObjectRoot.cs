@@ -2,7 +2,7 @@
 
 namespace DumpExplorer.Core
 {
-    public class ObjectRoot
+    public class FinalizableObjectRoot
     {
         public ulong Address { get; set; }
         public Object Object { get; set; }

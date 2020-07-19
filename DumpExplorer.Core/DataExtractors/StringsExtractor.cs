@@ -9,7 +9,7 @@ namespace DumpExplorer.Core.DataExtractors
     {
         public string Name => "String Extractor";
         public string Description => "Extract information about all strings on the managed heap";
-        public string TypeName => "string";
+        public string TypeName => nameof(String);
 
         public IEnumerable<dynamic> ExtractData(ClrRuntime clr, Action<string> actionLog = null)
         {

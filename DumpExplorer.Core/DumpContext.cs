@@ -1,8 +1,11 @@
 ﻿using DumpExplorer.Core.Events;
+using DumpExplorer.Core.Indexes;
 using Microsoft.Diagnostics.Runtime;
 using Raven.Client.Documents;
 using SuperDump;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -24,6 +27,7 @@ namespace DumpExplorer.Core
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _databaseName = databaseName;
+            _documentStore.ExecuteIndex(new GcRootIndex());
         }
 
         public async Task ExtractDataWithAsync(params IDataExtractor[] dataExtractors) => 
@@ -35,7 +39,7 @@ namespace DumpExplorer.Core
             var bulkInsert = _documentStore.BulkInsert(_databaseName, token);
             OnOperationEvent(dataExtractor.Name, TaskStatus.Running);
             try
-            {                
+            {
                 foreach (var dataItem in dataExtractor.ExtractData(_runtime, message => OnOperationEvent(dataExtractor.Name, TaskStatus.Running, message)))
                 {
                     var newId = await bulkInsert.StoreAsync(dataItem);
@@ -54,7 +58,7 @@ namespace DumpExplorer.Core
             OnOperationEvent(dataExtractor.Name, TaskStatus.RanToCompletion);
         }
 
-        public void LoadDump(string dumpPath)
+        public void LoadFromDump(string dumpPath)
         {
             Debug.Assert(_documentStore != null);
 
@@ -69,6 +73,12 @@ namespace DumpExplorer.Core
             _runtime = _target.CreateRuntime();
         }
 
+        public IReadOnlyList<dynamic> Query(string rql)
+        {
+            using var session = !string.IsNullOrWhiteSpace(_databaseName) ? 
+                _documentStore.OpenSession() :_documentStore.OpenSession(_databaseName);
+            return session.Advanced.RawQuery<dynamic>(rql).ToList();
+        }
 
         public void Dispose()
         {
