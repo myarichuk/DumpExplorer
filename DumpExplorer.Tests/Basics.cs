@@ -50,12 +50,12 @@ namespace DumpExplorer.Tests
         }
 
         [Fact]
-        public async Task Can_load_dump()
+        public void Can_load_dump()
         {
             using var dumpContext = new DumpContext(_store);
             dumpContext.LoadFromDump("allocations.dmp");
 
-            await dumpContext.ExtractDataWithAsync(new HeapObjectsExtractor(), new StringsExtractor());
+            dumpContext.ExtractDataWith(new HeapObjectsExtractor(), new StringsExtractor());
 
             using var session = _store.OpenSession();
 
@@ -68,13 +68,13 @@ namespace DumpExplorer.Tests
         }
 
         [Fact]
-        public async Task Can_extract_gc_roots()
+        public void Can_extract_gc_roots()
         {
             using var dumpContext = new DumpContext(_store);
             dumpContext.LoadFromDump("allocations.dmp");
 
 
-            await dumpContext.ExtractDataWithAsync(new GcRootsExtractor(), new HeapObjectsExtractor());
+            dumpContext.ExtractDataWith(new GcRootsExtractor(), new HeapObjectsExtractor());
             using var session = _store.OpenSession();
 
             var gcRootCount = session.Query<GcRootPath>().Count();

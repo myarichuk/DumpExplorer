@@ -9,8 +9,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Playground", "Playground\Pl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpExplorer.Tests", "DumpExplorer.Tests\DumpExplorer.Tests.csproj", "{0CAD7EC7-E33A-43BF-B249-DD126A11098D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DumpExplorer", "DumpExplorer\DumpExplorer.csproj", "{CBA54256-EE4A-482C-A610-2618E6D28A90}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3EB235BF-98EB-4995-BF07-ED98692714C0}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -34,10 +32,6 @@ Global
 		{0CAD7EC7-E33A-43BF-B249-DD126A11098D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CAD7EC7-E33A-43BF-B249-DD126A11098D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CAD7EC7-E33A-43BF-B249-DD126A11098D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CBA54256-EE4A-482C-A610-2618E6D28A90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBA54256-EE4A-482C-A610-2618E6D28A90}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CBA54256-EE4A-482C-A610-2618E6D28A90}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CBA54256-EE4A-482C-A610-2618E6D28A90}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

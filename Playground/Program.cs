@@ -15,7 +15,7 @@ public class Program
         public ref int X => ref _x;
     }
 
-    public static async Task Main()
+    public static void Main()
     {
         EmbeddedServer.Instance.StartServer(new ServerOptions
         {
@@ -41,7 +41,7 @@ public class Program
 
         EmbeddedServer.Instance.OpenStudioInBrowser();
 
-        await dumpContext.ExtractDataWithAsync(new GcRootsExtractor(), new HeapObjectsExtractor(), new StringsExtractor());
+        dumpContext.ExtractDataWith(new GcRootsExtractor(), new HeapObjectsExtractor(), new StringsExtractor());
 
         Console.ReadKey();
     }

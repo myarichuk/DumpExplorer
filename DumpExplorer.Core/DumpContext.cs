@@ -1,4 +1,5 @@
-﻿using DumpExplorer.Core.Events;
+﻿using AutoMapper.Internal;
+using DumpExplorer.Core.Events;
 using DumpExplorer.Core.Indexes;
 using Microsoft.Diagnostics.Runtime;
 using Raven.Client.Documents;
@@ -30,19 +31,19 @@ namespace DumpExplorer.Core
             _documentStore.ExecuteIndex(new GcRootIndex());
         }
 
-        public async Task ExtractDataWithAsync(params IDataExtractor[] dataExtractors) => 
-            await Task.WhenAll(dataExtractors.Select(extractor => ExtractDataWithAsync(extractor))).ConfigureAwait(false);
+        public void ExtractDataWith(params IDataExtractor[] dataExtractors) => 
+            dataExtractors.ForAll(extractor => ExtractDataWith(extractor));
 
-        public async Task ExtractDataWithAsync(IDataExtractor dataExtractor, CancellationToken token = default)
+        public void ExtractDataWith(IDataExtractor dataExtractor, CancellationToken token = default)
         {
             OnOperationEvent(dataExtractor.Name, TaskStatus.Created);
-            var bulkInsert = _documentStore.BulkInsert(_databaseName, token);
+            using var bulkInsert = _documentStore.BulkInsert(_databaseName, token);
             OnOperationEvent(dataExtractor.Name, TaskStatus.Running);
             try
             {
                 foreach (var dataItem in dataExtractor.ExtractData(_runtime, message => OnOperationEvent(dataExtractor.Name, TaskStatus.Running, message)))
                 {
-                    var newId = await bulkInsert.StoreAsync(dataItem);
+                    var newId = bulkInsert.Store(dataItem);
                     OnOperationEvent(dataExtractor.Name, TaskStatus.Running, $"Imported data item with Id = {newId} (data item type = {dataExtractor.TypeName})");
                 }
             }
@@ -51,10 +52,7 @@ namespace DumpExplorer.Core
                 OnOperationEvent(dataExtractor.Name, TaskStatus.Faulted, $"Failed data extraction task. Message: {e.Message}, Stack trace: {e.StackTrace}");
                 throw;
             }
-            finally
-            {
-                await bulkInsert.DisposeAsync();
-            }
+
             OnOperationEvent(dataExtractor.Name, TaskStatus.RanToCompletion);
         }
 
