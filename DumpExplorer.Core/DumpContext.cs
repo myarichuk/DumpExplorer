@@ -33,6 +33,7 @@ namespace DumpExplorer.Core
             _documentStore.ExecuteIndex(new GcRootIndex());
             _documentStore.ExecuteIndex(new HeapStatIndex());
             _documentStore.ExecuteIndex(new HeapStatByGenerationIndex());
+            _documentStore.ExecuteIndex(new DuplicateStringsIndex());
         }
 
         public void ExtractDataWith(params IDataExtractor[] dataExtractors) => 
