@@ -14,7 +14,6 @@ public class Program
         private int _x;
         public ref int X => ref _x;
     }
-
     public static void Main()
     {
         EmbeddedServer.Instance.StartServer(new ServerOptions
@@ -34,7 +33,7 @@ public class Program
                     serializer.ContractResolver = new DumpExplorerContractSerializer();
                 }
             }
-        }); 
+        });
 
         using var dumpContext = new DumpContext(store);
         dumpContext.LoadFromDump("allocations.dmp");
