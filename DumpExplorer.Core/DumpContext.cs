@@ -28,8 +28,11 @@ namespace DumpExplorer.Core
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _databaseName = databaseName;
+
+            //ensure indexes exist
             _documentStore.ExecuteIndex(new GcRootIndex());
             _documentStore.ExecuteIndex(new HeapStatIndex());
+            _documentStore.ExecuteIndex(new HeapStatByGenerationIndex());
         }
 
         public void ExtractDataWith(params IDataExtractor[] dataExtractors) => 
