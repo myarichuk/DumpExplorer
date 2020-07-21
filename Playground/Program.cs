@@ -1,6 +1,11 @@
-﻿using Raven.Embedded;
+﻿using DumpExplorer.Core;
+using DumpExplorer.Core.DataExtractors;
+using Newtonsoft.Json;
+using Raven.Client.Documents.Conventions;
+using Raven.Embedded;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 public class Program
 {
@@ -10,7 +15,7 @@ public class Program
         public ref int X => ref _x;
     }
 
-    public static void Main()
+    public static async Task Main()
     {
         EmbeddedServer.Instance.StartServer(new ServerOptions
         {
@@ -18,12 +23,26 @@ public class Program
             CommandLineArgs = new List<string> { "Setup.Mode=None", "RunInMemory=true" },
             FrameworkVersion = Environment.Version.ToString()
         });
-        var store = EmbeddedServer.Instance.GetDocumentStore("TestDB");
-
-        using (var session = store.OpenSession())
+        var store = EmbeddedServer.Instance.GetDocumentStore(new DatabaseOptions("Dump")
         {
-            session.Store(new FooBar());
-            session.SaveChanges();
-        }
+            Conventions = new DocumentConventions
+            {
+                CustomizeJsonSerializer = serializer =>
+                {
+                    serializer.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    serializer.NullValueHandling = NullValueHandling.Ignore;
+                    serializer.ContractResolver = new DumpExplorerContractSerializer();
+                }
+            }
+        }); 
+
+        using var dumpContext = new DumpContext(store);
+        dumpContext.LoadFromDump("allocations.dmp");
+
+        EmbeddedServer.Instance.OpenStudioInBrowser();
+
+        await dumpContext.ExtractDataWithAsync(new GcRootsExtractor(), new HeapObjectsExtractor(), new StringsExtractor());
+
+        Console.ReadKey();
     }
 }

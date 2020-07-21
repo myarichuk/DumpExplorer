@@ -17,7 +17,9 @@ namespace DumpExplorer.Core
                 cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrObject, String>()
                     .ForMember(x => x.Value, opt => opt.MapFrom(src => src.AsString(1024 * 1024 * 10) ?? string.Empty));
                 cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrFinalizerRoot, FinalizableObjectRoot>();
-                cfg.CreateMap<Microsoft.Diagnostics.Runtime.IClrRoot, GcRoot>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.IClrRoot, GcRoot>()
+                    .ForMember(x => x.RootAddress, opt => opt.MapFrom(src => src.Address))
+                    .ForMember(x => x.RootObjectId, opt => opt.MapFrom(src => $"{nameof(Object)}/{src.Object.Address}"));
                 cfg.CreateMap<Microsoft.Diagnostics.Runtime.GCRootPath, GcRootPath>();
             });
 

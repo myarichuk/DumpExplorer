@@ -5,7 +5,9 @@ namespace DumpExplorer.Core
 {
     public class GcRoot
     {
-        public ulong Address { get; set; }
+        public string RootObjectId { get; set; }
+
+        public ulong RootAddress { get; set; }
         public ClrRootKind RootKind { get; set; }
         public int Generation { get; set; }
         public bool IsInterior { get; set; }

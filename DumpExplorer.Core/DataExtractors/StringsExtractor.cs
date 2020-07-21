@@ -20,7 +20,11 @@ namespace DumpExplorer.Core.DataExtractors
                    where obj.Type == clr.Heap.StringType
                    let segment = clr.Heap.GetSegmentByAddress(obj.Address)
                    select AutoMapper.Instance.Map<String>(obj,
-                        opts => opts.AfterMap((_, dst) => dst.Generation = segment.GetGeneration(dst.Address)));
+                        opts => opts.AfterMap((_, dst) =>
+                        {
+                            dst.Id = $"{TypeName}/{dst.Address}";
+                            dst.Generation = segment.GetGeneration(dst.Address);
+                        }));
         }
     }
 }

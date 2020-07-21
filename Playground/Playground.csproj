@@ -6,7 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\allocations.dmp" Link="allocations.dmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="RavenDB.Embedded" Version="4.2.103" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DumpExplorer.Core\DumpExplorer.Core.csproj" />
   </ItemGroup>
 
 </Project>
