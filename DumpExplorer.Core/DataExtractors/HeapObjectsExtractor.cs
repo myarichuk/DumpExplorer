@@ -17,6 +17,7 @@ namespace DumpExplorer.Core.DataExtractors
         {
             if (!clr.Heap.CanWalkHeap)
                 throw new InvalidOperationException("Cannot extract heap objects, heap is not in a walkable state");
+            
             return from obj in clr.Heap.EnumerateObjects()
                    //known issue in importing to RavenDB --> TODO: investigate later
                    where !obj.Type.Name.StartsWith("System.Diagnostics.Tracing")

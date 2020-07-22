@@ -52,7 +52,7 @@ namespace DumpExplorer.Core
                     OnOperationEvent(dataExtractor.Name, TaskStatus.Running, $"Imported data item with Id = {newId} (data item type = {dataExtractor.TypeName})");
                 }
             }
-            catch(Exception e)
+            catch(System.Exception e)
             {
                 OnOperationEvent(dataExtractor.Name, TaskStatus.Faulted, $"Failed data extraction task. Message: {e.Message}, Stack trace: {e.StackTrace}");
                 throw;

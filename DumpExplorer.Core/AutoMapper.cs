@@ -21,6 +21,13 @@ namespace DumpExplorer.Core
                     .ForMember(x => x.RootAddress, opt => opt.MapFrom(src => src.Address))
                     .ForMember(x => x.RootObjectId, opt => opt.MapFrom(src => $"{nameof(Object)}/{src.Object.Address}"));
                 cfg.CreateMap<Microsoft.Diagnostics.Runtime.GCRootPath, GcRootPath>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrThread, Thread>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrException, Core.Exception>()
+                    .ForMember(x => x.TypeName, opt => opt.MapFrom(src => src.Type.Name))
+                    .ForMember(x => x.Thread, opt => opt.AllowNull())
+                    .ForMember(x => x.StackTrace, opt => opt.AllowNull())
+                    .ForMember(x => x.Message, opt => opt.Ignore());
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrStackFrame, Core.StackFrame>();
             });
 
             return new Mapper(config);

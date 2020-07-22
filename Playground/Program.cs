@@ -40,7 +40,7 @@ public class Program
 
         EmbeddedServer.Instance.OpenStudioInBrowser();
 
-        dumpContext.ExtractDataWith(new GcRootsExtractor(), new HeapObjectsExtractor(), new StringsExtractor());
+        dumpContext.ExtractDataWith(new ExceptionExtractor(), new StringsExtractor(), new GcRootsExtractor(), new HeapObjectsExtractor());
 
         Console.ReadKey();
     }

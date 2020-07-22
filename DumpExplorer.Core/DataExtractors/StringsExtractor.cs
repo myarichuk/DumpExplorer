@@ -18,10 +18,10 @@ namespace DumpExplorer.Core.DataExtractors
             
             return from obj in clr.Heap.EnumerateObjects()
                    where obj.Type == clr.Heap.StringType
-                   let segment = clr.Heap.GetSegmentByAddress(obj.Address)
+                   let segment = clr.Heap.GetSegmentByAddress(obj.Address)                   
                    select AutoMapper.Instance.Map<String>(obj,
                         opts => opts.AfterMap((_, dst) =>
-                        {
+                        {                            
                             dst.Id = $"{TypeName}/{dst.Address}";
                             dst.Generation = segment.GetGeneration(dst.Address);
                         }));
