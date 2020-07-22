@@ -10,6 +10,9 @@ namespace DumpExplorer.Core
 
         public int Generation { get; set; }
 
+        //IDs of other objects this object references
+        public List<string> References { get; set; }
+
         //
         // Summary:
         //     Gets a value indicating whether this object possibly contians GC pointers.

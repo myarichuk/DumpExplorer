@@ -15,7 +15,7 @@ namespace DumpExplorer.Core.DataExtractors
         {
             if (!clr.Heap.CanWalkHeap)
                 throw new InvalidOperationException("Cannot extract strings, heap is not in a walkable state");
-
+            
             return from obj in clr.Heap.EnumerateObjects()
                    where obj.Type == clr.Heap.StringType
                    let segment = clr.Heap.GetSegmentByAddress(obj.Address)
