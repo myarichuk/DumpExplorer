@@ -35,7 +35,7 @@ public class Program
             CommandLineArgs = new List<string> { "Setup.Mode=None", "RunInMemory=true" },
             FrameworkVersion = Environment.Version.ToString()
         });
-        var store = EmbeddedServer.Instance.GetDocumentStore(new DatabaseOptions("Dump")
+        var store = EmbeddedServer.Instance.GetDocumentStore(new DatabaseOptions("Metadata")
         {
             Conventions = new DocumentConventions
             {

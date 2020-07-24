@@ -5,6 +5,8 @@ using Microsoft.Diagnostics.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Raven.Client.Documents;
+using Raven.Client.ServerWide;
+using Raven.Client.ServerWide.Operations;
 using SuperDump;
 using System;
 using System.Collections.Generic;
@@ -21,7 +23,7 @@ namespace DumpExplorer.Core
         private readonly IDocumentStore _documentStore;
         private DataTarget _target;
         private ClrRuntime _runtime;
-        private readonly string _databaseName;
+        private string _databaseName;
 
         public event EventHandler<OperationEventArgs> OperationEvent;
 
@@ -29,13 +31,6 @@ namespace DumpExplorer.Core
         {
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _databaseName = databaseName;
-
-
-            //ensure indexes exist
-            _documentStore.ExecuteIndex(new GcRootIndex());
-            _documentStore.ExecuteIndex(new HeapStatIndex());
-            _documentStore.ExecuteIndex(new HeapStatByGenerationIndex());
-            _documentStore.ExecuteIndex(new DuplicateStringsIndex());
         }
 
         public void ExtractDataWith(params IDataExtractor[] dataExtractors) =>
@@ -57,8 +52,24 @@ namespace DumpExplorer.Core
             }
             catch(System.Exception e)
             {
-                OnOperationEvent(dataExtractor.Name, TaskStatus.Faulted, $"Failed data extraction task. Message: {e.Message}, Stack trace: {e.StackTrace}");
-                throw;
+                OnOperationEvent(dataExtractor.Name, TaskStatus.Faulted, $"Failed data extraction task. Message: {e.Message}, Stack trace: {e.StackTrace}. Retrying one-by-one");
+                try
+                {
+                    foreach (var dataItem in dataExtractor.ExtractData(_runtime, message => OnOperationEvent(dataExtractor.Name, TaskStatus.Running, message)))
+                    {
+                        using (var session = _documentStore.OpenSession(_databaseName))
+                        {
+                            session.Store(dataItem);
+                            session.SaveChanges();
+                            OnOperationEvent(dataExtractor.Name, TaskStatus.Running, $"Imported data item(data item type = {dataExtractor.TypeName})");
+                        }
+                    }
+                }
+                catch (System.Exception inner)
+                {
+                    OnOperationEvent(dataExtractor.Name, TaskStatus.Faulted, $"Failed data extraction task. Message: {inner.Message}, Stack trace: {inner.StackTrace}");
+                    throw;
+                }
             }
 
             OnOperationEvent(dataExtractor.Name, TaskStatus.RanToCompletion);
@@ -70,6 +81,17 @@ namespace DumpExplorer.Core
 
             if (_target != null)
                 Dispose();
+            _databaseName ??= dumpPath;
+
+            var getDatabaseRecordResult = _documentStore.Maintenance.Server.Send(new GetDatabaseRecordOperation(_databaseName));
+            if(getDatabaseRecordResult == null)//no such database
+                _documentStore.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(_databaseName)));
+            //ensure indexes exist
+            _documentStore.ExecuteIndex(new GcRootIndex(), _databaseName);
+            _documentStore.ExecuteIndex(new HeapStatIndex(), _databaseName);
+            _documentStore.ExecuteIndex(new HeapStatByGenerationIndex(), _databaseName);
+            _documentStore.ExecuteIndex(new DuplicateStringsIndex(), _databaseName);
+
 
             _target = DataTarget.LoadDump(dumpPath);
 

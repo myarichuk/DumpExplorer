@@ -77,7 +77,7 @@ namespace DumpExplorer.Tests
             dumpContext.ExtractDataWith(new GcRootsExtractor(), new HeapObjectsExtractor());
             using var session = _store.OpenSession();
 
-            var gcRootCount = session.Query<GcRootPath>().Count();
+            var gcRootCount = session.Query<GcRoot>().Count();
 
             //sanity check...
             Assert.Equal(60, gcRootCount);

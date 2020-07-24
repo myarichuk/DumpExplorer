@@ -5,7 +5,7 @@ using System.Linq;
 namespace DumpExplorer.Core.Indexes
 {
     //TODO: fix this, at the moment this doesn't work properly
-    public class GcRootIndex : AbstractIndexCreationTask<GcRootPath, GcRootIndex.Result>
+    public class GcRootIndex : AbstractIndexCreationTask<GcRoot, GcRootIndex.Result>
     {
         public class Result
         {
@@ -16,10 +16,10 @@ namespace DumpExplorer.Core.Indexes
         public GcRootIndex()
         {
             Map = gcRoots => from rootRecord in gcRoots
-                             where rootRecord.Root.RootAddress != 0 && rootRecord.Path.Count > 0
+                             where rootRecord.Root.Address != 0 && rootRecord.Path.Count > 0
                              select new Result
                              {
-                                 Root = LoadDocument<Object>(rootRecord.Root.RootObjectId),
+                                 Root = LoadDocument<Object>(rootRecord.Root.Id),
                                  Paths = new [] { LoadDocument<Object>(rootRecord.Path.Select(address => $"{nameof(Object)}/{address}")) }
                              };
 
@@ -30,6 +30,9 @@ namespace DumpExplorer.Core.Indexes
                                     Root = g.Key,
                                     Paths = g.SelectMany(x => x.Paths)
                                 };
+
+            Index(x => x.Root, FieldIndexing.Default);
+            Index(x => x.Root.Type.Name, FieldIndexing.Default);
         }
     }
 }

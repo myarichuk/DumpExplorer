@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using System;
+using System.Linq;
 
 namespace DumpExplorer.Core
 {
@@ -17,10 +18,12 @@ namespace DumpExplorer.Core
                 cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrObject, String>()                    
                     .ForMember(x => x.Value, opt => opt.MapFrom(src => src.AsString(1024 * 1024 * 10) ?? string.Empty));
                 cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrFinalizerRoot, FinalizableObjectRoot>();
-                cfg.CreateMap<Microsoft.Diagnostics.Runtime.IClrRoot, GcRoot>()
-                    .ForMember(x => x.RootAddress, opt => opt.MapFrom(src => src.Address))
-                    .ForMember(x => x.RootObjectId, opt => opt.MapFrom(src => $"{nameof(Object)}/{src.Object.Address}"));
-                cfg.CreateMap<Microsoft.Diagnostics.Runtime.GCRootPath, GcRootPath>();
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.IClrRoot, GcRootInfo>()
+                    .ForMember(x => x.Address, opt => opt.MapFrom(src => src.Address))
+                    .ForMember(x => x.Id, opt => opt.MapFrom(src => $"{nameof(Object)}/{src.Object.Address}"));
+                cfg.CreateMap<Microsoft.Diagnostics.Runtime.GCRootPath, GcRoot>()
+                    .ForMember(x => x.Id, opt => opt.MapFrom(src => $"{nameof(GcRoot)}/{src.Root.Address}"))
+                    .ForMember(x => x.Path, opt => opt.MapFrom(src => src.Path.Select(o => $"{nameof(Object)}/{o.Address}").ToList()));
                 cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrThread, Thread>();
                 cfg.CreateMap<Microsoft.Diagnostics.Runtime.ClrException, Core.Exception>()
                     .ForMember(x => x.TypeName, opt => opt.MapFrom(src => src.Type.Name))

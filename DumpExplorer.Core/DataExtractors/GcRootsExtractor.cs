@@ -9,7 +9,7 @@ namespace DumpExplorer.Core.DataExtractors
     {
         public string Name => "GC Roots Extractor";
         public string Description => "Extract information about GC roots";
-        public string TypeName => nameof(GcRoot);
+        public string TypeName => nameof(GcRootInfo);
 
         public IEnumerable<dynamic> ExtractData(ClrRuntime clr, Action<string> actionLog = null)
         {
@@ -27,7 +27,7 @@ namespace DumpExplorer.Core.DataExtractors
                     actionLog?.Invoke($"Enumerating roots for ${currentObjectName}");
                     foreach (var rootPath in gcRootHandle.EnumerateGCRoots(obj.Address, true, Environment.ProcessorCount))
                     {
-                        yield return AutoMapper.Instance.Map<GcRootPath>(rootPath,
+                        yield return AutoMapper.Instance.Map<GcRoot>(rootPath,
                             opts => opts.AfterMap((_, dst) => {
                                 var segment = clr.Heap.GetSegmentByAddress(rootPath.Root.Object);
                                 dst.Generation = segment.GetGeneration(rootPath.Root.Object.Address);
