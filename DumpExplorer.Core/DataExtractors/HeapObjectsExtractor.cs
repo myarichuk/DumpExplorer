@@ -19,16 +19,16 @@ namespace DumpExplorer.Core.DataExtractors
                 throw new InvalidOperationException("Cannot extract heap objects, heap is not in a walkable state");
             
             return from obj in clr.Heap.EnumerateObjects()
-                   //known issue in importing to RavenDB --> TODO: investigate later
-                   where !obj.Type.Name.StartsWith("System.Diagnostics.Tracing")
                    let segment = clr.Heap.GetSegmentByAddress(obj.Address)
                    let references = obj.EnumerateReferences(true)
                    select AutoMapper.Instance.Map<Object>(obj, 
                         opts => opts.AfterMap((_, dst) =>
                         {                            
                             dst.Id = $"{TypeName}/{dst.Address}";
+                            
                             dst.References = references.Select(refObj => $"{nameof(Object)}/{refObj.Address}").ToList();
                             dst.Generation = segment.GetGeneration(dst.Address);
+                            actionLog?.Invoke($"Extracted object of type = {dst.Type.Name}");
                         }));
         }
     }

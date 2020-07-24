@@ -5,6 +5,8 @@ namespace DumpExplorer.Core
 {
     public class Type
     {
+        public string Id { get; set; }
+
         //
         // Summary:
         //     Gets a value indicating whether this type is a primitive (System.Int32, System.Single,
@@ -51,7 +53,7 @@ namespace DumpExplorer.Core
         // Summary:
         //     Gets all possible fields in this type. It does not return dynamically typed fields.
         //     Returns an empty list if there are no fields.
-        public List<Field> Fields { get; set; }
+        //public List<Field> Fields { get; set; }
         //
         // Summary:
         //     Gets a value indicating whether this type is an object reference.
@@ -63,7 +65,7 @@ namespace DumpExplorer.Core
         // Summary:
         //     Gets a list of static fields on this type. Returns an empty list if there are
         //     no fields.
-        public List<Field> StaticFields { get; set; }
+        //public List<Field> StaticFields { get; set; }
         //
         // Summary:
         //     If this type inherits from another type, this is that type. Can return null if
@@ -77,7 +79,7 @@ namespace DumpExplorer.Core
         //
         // Summary:
         //     Gets the type of the element referenced by the pointer.
-        public Type? ComponentType { get; set; }
+        //public Type? ComponentType { get; set; }
         //
         // Summary:
         //     A type is an array if you can use the array operators below, Abstractly arrays
@@ -114,7 +116,7 @@ namespace DumpExplorer.Core
         // Summary:
         //     Gets the list of methods this type implements.
 
-        public List<Method> Methods { get; set; }
+        //public List<Method> Methods { get; set; }
         //
         // Summary:
         //     Gets a value indicating whether this type is a value type.

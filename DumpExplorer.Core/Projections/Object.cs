@@ -53,7 +53,8 @@ namespace DumpExplorer.Core
         //
         // Summary:
         //     Gets the type of the object.
-        public Type? Type { get; set; }
+        public Type Type { get; set; }
+
         //
         // Summary:
         //     Gets the address of the object.

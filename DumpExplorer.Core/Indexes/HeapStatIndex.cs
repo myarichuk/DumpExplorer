@@ -17,7 +17,7 @@ namespace DumpExplorer.Core.Indexes
         public HeapStatIndex()
         {
             Map = objects => from obj in objects
-                             where obj.Type != null
+                             where obj.Type.Name != null
                              select new Result
                              {
                                  Type = obj.Type.Name,

@@ -9,7 +9,7 @@ namespace DumpExplorer.Core.Indexes
     {
         public class Result
         {
-            public ulong RootAddress { get; set; }
+            public Object Root { get; set; }
             public IEnumerable<IEnumerable<Object>> Paths { get; set; }
         }
 
@@ -19,15 +19,15 @@ namespace DumpExplorer.Core.Indexes
                              where rootRecord.Root.RootAddress != 0 && rootRecord.Path.Count > 0
                              select new Result
                              {
-                                 RootAddress = rootRecord.Root.RootAddress,
+                                 Root = LoadDocument<Object>(rootRecord.Root.RootObjectId),
                                  Paths = new [] { LoadDocument<Object>(rootRecord.Path.Select(address => $"{nameof(Object)}/{address}")) }
                              };
 
-            Reduce = results => from result in results
-                                group result by result.RootAddress into g
+            Reduce = results => from result in results                                
+                                group result by result.Root into g
                                 select new Result
                                 {
-                                    RootAddress = g.Key,
+                                    Root = g.Key,
                                     Paths = g.SelectMany(x => x.Paths)
                                 };
         }

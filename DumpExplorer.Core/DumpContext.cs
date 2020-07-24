@@ -2,10 +2,11 @@
 using DumpExplorer.Core.Events;
 using DumpExplorer.Core.Indexes;
 using Microsoft.Diagnostics.Runtime;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Raven.Client.Documents;
 using SuperDump;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -29,6 +30,7 @@ namespace DumpExplorer.Core
             _documentStore = documentStore ?? throw new ArgumentNullException(nameof(documentStore));
             _databaseName = databaseName;
 
+
             //ensure indexes exist
             _documentStore.ExecuteIndex(new GcRootIndex());
             _documentStore.ExecuteIndex(new HeapStatIndex());
@@ -36,18 +38,19 @@ namespace DumpExplorer.Core
             _documentStore.ExecuteIndex(new DuplicateStringsIndex());
         }
 
-        public void ExtractDataWith(params IDataExtractor[] dataExtractors) => 
+        public void ExtractDataWith(params IDataExtractor[] dataExtractors) =>
             dataExtractors.ForAll(extractor => ExtractDataWith(extractor));
 
         public void ExtractDataWith(IDataExtractor dataExtractor, CancellationToken token = default)
         {
             OnOperationEvent(dataExtractor.Name, TaskStatus.Created);
             using var bulkInsert = _documentStore.BulkInsert(_databaseName, token);
+            
             OnOperationEvent(dataExtractor.Name, TaskStatus.Running);
             try
             {
                 foreach (var dataItem in dataExtractor.ExtractData(_runtime, message => OnOperationEvent(dataExtractor.Name, TaskStatus.Running, message)))
-                {
+                {                    
                     var newId = bulkInsert.Store(dataItem);
                     OnOperationEvent(dataExtractor.Name, TaskStatus.Running, $"Imported data item with Id = {newId} (data item type = {dataExtractor.TypeName})");
                 }
@@ -73,7 +76,7 @@ namespace DumpExplorer.Core
             if (_target.ClrVersions.Length == 0)
                 throw new InvalidOperationException("Haven't found relevant CLR versions for the dump, cannot continue with the import");
 
-            _runtime = _target.CreateRuntime();
+            _runtime = _target.CreateRuntime();           
         }
 
         public IReadOnlyList<dynamic> Query(string rql)
