@@ -30,9 +30,6 @@ namespace DumpExplorer.Core.Indexes
                                     Root = g.Key,
                                     Paths = g.SelectMany(x => x.Paths)
                                 };
-
-            Index(x => x.Root, FieldIndexing.Default);
-            Index(x => x.Root.Type.Name, FieldIndexing.Default);
         }
     }
 }

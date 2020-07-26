@@ -19,6 +19,7 @@ namespace DumpExplorer.Core.DataExtractors
                 throw new InvalidOperationException("Cannot extract heap objects, heap is not in a walkable state");
             
             return from obj in clr.Heap.EnumerateObjects()
+                   where obj.Type != null
                    let segment = clr.Heap.GetSegmentByAddress(obj.Address)
                    let references = obj.EnumerateReferences(true)
                    select AutoMapper.Instance.Map<Object>(obj, 

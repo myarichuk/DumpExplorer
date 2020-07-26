@@ -15,7 +15,6 @@ namespace DumpExplorer.Core.DataExtractors
         {
             if(!clr.Heap.CanWalkHeap)
                 throw new InvalidOperationException("Cannot extract gc roots, heap is not in a walkable state");
-
             var gcRootHandle = new GCRoot(clr.Heap);
             var currentObjectName = string.Empty;
             try
@@ -23,6 +22,8 @@ namespace DumpExplorer.Core.DataExtractors
                 gcRootHandle.ProgressUpdated += ReportGcRootEnumerationProgress;
                 foreach (var obj in clr.Heap.EnumerateObjects())
                 {
+                    if (obj.Type == null)
+                        continue;
                     currentObjectName = $"{obj.Type.Name} - #{obj.Address}";
                     actionLog?.Invoke($"Enumerating roots for ${currentObjectName}");
                     foreach (var rootPath in gcRootHandle.EnumerateGCRoots(obj.Address, true, Environment.ProcessorCount))
