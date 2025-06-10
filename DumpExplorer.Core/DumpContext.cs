@@ -1,5 +1,4 @@
-﻿using AutoMapper.Internal;
-using DumpExplorer.Core.Events;
+﻿using DumpExplorer.Core.Events;
 using DumpExplorer.Core.Indexes;
 using Microsoft.Diagnostics.Runtime;
 using Newtonsoft.Json;
@@ -33,8 +32,13 @@ namespace DumpExplorer.Core
             _databaseName = databaseName;
         }
 
-        public void ExtractDataWith(params IDataExtractor[] dataExtractors) =>
-            dataExtractors.ForAll(extractor => ExtractDataWith(extractor));
+        public void ExtractDataWith(params IDataExtractor[] dataExtractors)
+        {
+            foreach (var extractor in dataExtractors)
+            {
+                ExtractDataWith(extractor);
+            }
+        }
 
         public void ExtractDataWith(IDataExtractor dataExtractor, CancellationToken token = default)
         {
